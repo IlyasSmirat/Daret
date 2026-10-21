@@ -24,7 +24,13 @@ function creeParticipant(){
     input.required = true;
     input.className = "w-full rounded-md border p-2";
 
+    const ButtonSupprimer = document.createElement("button");
+    ButtonSupprimer.type = "button";
+    ButtonSupprimer.textContent = "Supprimer";
+    ButtonSupprimer.className = "rounded-md border px-3 py-2";
+
     li.appendChild(input);
+    li.appendChild(ButtonSupprimer);
     ParticipantsList.appendChild(li);
     participantsCounter();
 }
@@ -33,5 +39,14 @@ BouttonAjouter.addEventListener("click", function(){
     if (ParticipantsList.children.length < 20)
     {
         creeParticipant();
+    }
+});
+
+ParticipantsList.addEventListener("click", function(event){
+    if(event.target.textContent === "Supprimer"){
+        if(ParticipantsList.children.length > 2){
+            event.target.parentElement.remove();
+            participantsCounter();
+        }
     }
 });
