@@ -5,6 +5,12 @@ const erreurNom = document.querySelector("#nom-cercle-erreur");
 const ParticipantsList = document.querySelector("#participants-liste");
 const ParticipantsCounter = document.querySelector("#participants-compteur");
 const BouttonAjouter = document.querySelector("#ajouter-participant");
+const resumeCagnotte = document.querySelector("#resume-cagnotte");
+const resumeTotalCycle = document.querySelector("#resume-total-cycle");
+const resumeNbTours = document.querySelector("#resume-nb-tours");
+const GenererButton = document.querySelector("#generer");
+const ResumeDates = document.querySelector("#resume-dates")
+
 let prochainId = 1;
 
 function participantsCounter (){
@@ -165,6 +171,10 @@ formulaire.addEventListener("submit", function(event) {
     const cotisationValide = validerCotisation();
     const dateValide = validerDate();
     const periodeValide = validerPeriode();
+    const nombreParticipants = ParticipantsList.children.length;
+    const nombreTours = calculerTours(nombreParticipants);
+    const montantBeneficiaire = CalculermontantBeneficiaire(Number(cotisation.value), nombreParticipants);
+    const TotalParticipants = calculerTotalParticipants(Number(cotisation.value), nombreTours);
 
     if (!nomValide) {
         CercleNom.focus();
@@ -174,5 +184,44 @@ formulaire.addEventListener("submit", function(event) {
         dateDebut.focus();
     } else if (!periodeValide) {
         Period.focus();
+    }else if (nombreParticipants >= 2){
+        resumeCagnotte.textContent = montantBeneficiaire + " MAD";
+        resumeTotalCycle.textContent = TotalParticipants + " MAD";
+        resumeNbTours.textContent = nombreTours;
+
+        const dates = CalculerDates(Period.value, nombreTours, dateDebut.value);
+        ResumeDates.textContent = dates.PremierDate.toLocaleDateString("fr-FR") + "-" +
+        dates.DernierDate.toLocaleDateString("fr-FR");
+
+        document.querySelector("#etat-vide").classList.add("hidden");
+        document.querySelector("#contenu-resultat").classList.remove("hidden");
     }
 });
+
+function CalculermontantBeneficiaire(cotisation, nombreParticipants) {
+    return cotisation * nombreParticipants;
+}
+
+function calculerTotalParticipants(cotisation, nombreTours) {
+    return cotisation * nombreTours;
+}
+
+function calculerTours(nombreParticipants) {
+    return nombreParticipants;
+}
+
+function CalculerDates(Period, nombreTours, dateDebut){
+    const PremierDate = new Date(dateDebut);
+    const DernierDate = new Date(dateDebut);
+
+    if(Period === "hebdomadaire"){
+        DernierDate.setDate(PremierDate.getDate() + (nombreTours - 1) * 7);
+    }
+    else if (Period === "quinzaine"){
+        DernierDate.setDate(PremierDate.getDate() + (nombreTours - 1) * 15);
+    }
+    else if (Period === "mensuelle"){
+        DernierDate.setMonth(PremierDate.getMonth() + (nombreTours - 1));
+    }
+    return {PremierDate: PremierDate, DernierDate: DernierDate};
+}
