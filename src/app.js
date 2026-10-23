@@ -1,4 +1,5 @@
 // Daret — simulateur. Ton code commence ici.
+
 // Le HTML (index.html) est déjà intégré : lis-le, repère les id et les data-*, puis fais-le vivre.
 const CercleNom = document.querySelector("#nom-cercle");
 const erreurNom = document.querySelector("#nom-cercle-erreur");
@@ -9,7 +10,8 @@ const resumeCagnotte = document.querySelector("#resume-cagnotte");
 const resumeTotalCycle = document.querySelector("#resume-total-cycle");
 const resumeNbTours = document.querySelector("#resume-nb-tours");
 const GenererButton = document.querySelector("#generer");
-const ResumeDates = document.querySelector("#resume-dates")
+const ResumeDates = document.querySelector("#resume-dates");
+const calendriercorps = document.querySelector("#calendrier-corps");
 
 let prochainId = 1;
 
@@ -40,6 +42,10 @@ function creeParticipant(){
     ParticipantsList.appendChild(li);
     participantsCounter();
 }
+
+    creeParticipant();
+    creeParticipant();
+    creeParticipant();
 
 BouttonAjouter.addEventListener("click", function(){
     if (ParticipantsList.children.length < 20)
@@ -195,6 +201,47 @@ formulaire.addEventListener("submit", function(event) {
 
         document.querySelector("#etat-vide").classList.add("hidden");
         document.querySelector("#contenu-resultat").classList.remove("hidden");
+
+        calendriercorps.textContent = "";
+        for(let i = 0; i < nombreTours; i++){
+        const numeroTour = i + 1;
+        const dateTour = CalculerDateTour(Period.value, numeroTour, dateDebut.value);
+        const ligne = document.createElement("tr");
+        ligne.dataset.tour = numeroTour;
+        const cellulenumero = document.createElement("td");
+        cellulenumero.textContent = numeroTour;
+        cellulenumero.classList.add("px-4", "py-3");
+        ligne.appendChild(cellulenumero);
+        const celluleDate = document.createElement("td");
+        celluleDate.textContent = dateTour.toLocaleDateString("fr-FR", {day: "numeric", month: "long", year: "numeric"});
+        celluleDate.classList.add("px-4", "py-3");
+        ligne.appendChild(celluleDate);
+        const participants = document.querySelectorAll('input[name = "participants"]');
+        const nomBenificiaire = participants[numeroTour - 1].value;
+        const celluleBeneficiaire = document.createElement("td");
+        celluleBeneficiaire.textContent = nomBenificiaire;
+        ligne.appendChild(celluleBeneficiaire);
+        const Cellulemontant = document.createElement("td");
+        Cellulemontant.textContent = `${Number(cotisation.value) * nombreTours } MAD`;
+        Cellulemontant.classList.add("px-4", "py-3");
+        ligne.appendChild(Cellulemontant);
+        const CelluleStatus = document.createElement("td");
+        CelluleStatus.textContent = "A venir";
+        CelluleStatus.classList.add("px-4", "py-3");
+        ligne.appendChild(CelluleStatus);
+        calendriercorps.appendChild(ligne);
+        const CelluleAction = document.createElement("td");
+        CelluleAction.classList.add("px-4", "py-3");
+
+        const ButtonDetails = document.createElement("button")
+        ButtonDetails.textContent = "Détails";
+        ButtonDetails.type = "button";
+        ButtonDetails.dataset.action = "ouvrir-details";
+        ButtonDetails.classList.add("rounded-md", "border", "px-3", "py-2");
+
+        CelluleAction.appendChild(ButtonDetails);
+        ligne.appendChild(CelluleAction);
+    }
     }
 });
 
@@ -224,4 +271,21 @@ function CalculerDates(Period, nombreTours, dateDebut){
         DernierDate.setMonth(PremierDate.getMonth() + (nombreTours - 1));
     }
     return {PremierDate: PremierDate, DernierDate: DernierDate};
+}
+
+function CalculerDateTour (Period, numeroTour, dateDebut){
+    const date = new Date(dateDebut);
+    if (Period === "hebdomadaire")
+    {
+        date.setDate(date.getDate() + (numeroTour - 1) * 7);
+    }
+    else if (Period === "quinzaine")
+    {
+        date.setDate(date.getDate() + (numeroTour - 1) * 15);
+    }
+    else if(Period === "mensuelle")
+    {
+        date.setMonth(date.getMonth() + (numeroTour - 1));
+    }
+    return date;
 }
