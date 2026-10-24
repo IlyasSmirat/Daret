@@ -230,17 +230,6 @@ formulaire.addEventListener("submit", function(event) {
         CelluleStatus.classList.add("px-4", "py-3");
         ligne.appendChild(CelluleStatus);
         calendriercorps.appendChild(ligne);
-        const CelluleAction = document.createElement("td");
-        CelluleAction.classList.add("px-4", "py-3");
-
-        const ButtonDetails = document.createElement("button")
-        ButtonDetails.textContent = "Détails";
-        ButtonDetails.type = "button";
-        ButtonDetails.dataset.action = "ouvrir-details";
-        ButtonDetails.classList.add("rounded-md", "border", "px-3", "py-2");
-
-        CelluleAction.appendChild(ButtonDetails);
-        ligne.appendChild(CelluleAction);
     }
     }
 });
