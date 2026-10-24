@@ -12,6 +12,8 @@ const resumeNbTours = document.querySelector("#resume-nb-tours");
 const GenererButton = document.querySelector("#generer");
 const ResumeDates = document.querySelector("#resume-dates");
 const calendriercorps = document.querySelector("#calendrier-corps");
+const buttonTirage = document.querySelector("#tirage-au-sort");
+const buttonOrdreSaisie = document.querySelector("#ordre-saisie");
 
 let prochainId = 1;
 
@@ -170,6 +172,9 @@ Period.addEventListener("input", function(){
     validerPeriode();
 });
 
+let orderBeneficiaire = [];
+let orderSaisie = [];
+
 formulaire.addEventListener("submit", function(event) {
     event.preventDefault();
 
@@ -178,6 +183,8 @@ formulaire.addEventListener("submit", function(event) {
     const dateValide = validerDate();
     const periodeValide = validerPeriode();
     const nombreParticipants = ParticipantsList.children.length;
+    orderSaisie = Array.from(ParticipantsList.querySelectorAll('input[name="participants"]')).map(input => input.value);
+    orderBeneficiaire = [...orderSaisie];
     const nombreTours = calculerTours(nombreParticipants);
     const montantBeneficiaire = CalculermontantBeneficiaire(Number(cotisation.value), nombreParticipants);
     const TotalParticipants = calculerTotalParticipants(Number(cotisation.value), nombreTours);
@@ -201,36 +208,7 @@ formulaire.addEventListener("submit", function(event) {
 
         document.querySelector("#etat-vide").classList.add("hidden");
         document.querySelector("#contenu-resultat").classList.remove("hidden");
-
-        calendriercorps.textContent = "";
-        for(let i = 0; i < nombreTours; i++){
-        const numeroTour = i + 1;
-        const dateTour = CalculerDateTour(Period.value, numeroTour, dateDebut.value);
-        const ligne = document.createElement("tr");
-        ligne.dataset.tour = numeroTour;
-        const cellulenumero = document.createElement("td");
-        cellulenumero.textContent = numeroTour;
-        cellulenumero.classList.add("px-4", "py-3");
-        ligne.appendChild(cellulenumero);
-        const celluleDate = document.createElement("td");
-        celluleDate.textContent = dateTour.toLocaleDateString("fr-FR", {day: "numeric", month: "long", year: "numeric"});
-        celluleDate.classList.add("px-4", "py-3");
-        ligne.appendChild(celluleDate);
-        const participants = document.querySelectorAll('input[name = "participants"]');
-        const nomBenificiaire = participants[numeroTour - 1].value;
-        const celluleBeneficiaire = document.createElement("td");
-        celluleBeneficiaire.textContent = nomBenificiaire;
-        ligne.appendChild(celluleBeneficiaire);
-        const Cellulemontant = document.createElement("td");
-        Cellulemontant.textContent = `${Number(cotisation.value) * nombreTours } MAD`;
-        Cellulemontant.classList.add("px-4", "py-3");
-        ligne.appendChild(Cellulemontant);
-        const CelluleStatus = document.createElement("td");
-        CelluleStatus.textContent = "A venir";
-        CelluleStatus.classList.add("px-4", "py-3");
-        ligne.appendChild(CelluleStatus);
-        calendriercorps.appendChild(ligne);
-    }
+        afficherCalendrier(nombreTours);
     }
 });
 
@@ -278,3 +256,51 @@ function CalculerDateTour (Period, numeroTour, dateDebut){
     }
     return date;
 }
+function afficherCalendrier(nombreTours){
+    calendriercorps.textContent = "";
+        for(let i = 0; i < nombreTours; i++){
+        const numeroTour = i + 1;
+        const dateTour = CalculerDateTour(Period.value, numeroTour, dateDebut.value);
+        const ligne = document.createElement("tr");
+        ligne.dataset.tour = numeroTour;
+        const cellulenumero = document.createElement("td");
+        cellulenumero.textContent = numeroTour;
+        cellulenumero.classList.add("px-4", "py-3");
+        ligne.appendChild(cellulenumero);
+        const celluleDate = document.createElement("td");
+        celluleDate.textContent = dateTour.toLocaleDateString("fr-FR", {day: "numeric", month: "long", year: "numeric"});
+        celluleDate.classList.add("px-4", "py-3");
+        ligne.appendChild(celluleDate);
+        const nomBenificiaire = orderBeneficiaire[numeroTour - 1];
+        const celluleBeneficiaire = document.createElement("td");
+        celluleBeneficiaire.textContent = nomBenificiaire;
+        ligne.appendChild(celluleBeneficiaire);
+        const Cellulemontant = document.createElement("td");
+        Cellulemontant.textContent = `${Number(cotisation.value) * nombreTours } MAD`;
+        Cellulemontant.classList.add("px-4", "py-3");
+        ligne.appendChild(Cellulemontant);
+        const CelluleStatus = document.createElement("td");
+        CelluleStatus.textContent = "A venir";
+        CelluleStatus.classList.add("px-4", "py-3");
+        ligne.appendChild(CelluleStatus);
+        calendriercorps.appendChild(ligne);
+    }
+}
+
+function melangerOrdre(liste) {
+    const resultat = [...liste];
+
+    for (let i = resultat.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [resultat[i], resultat[j]] = [resultat[j], resultat[i]];
+    }
+    return resultat;
+}
+buttonTirage.addEventListener("click", function() {
+    orderBeneficiaire = melangerOrdre(orderBeneficiaire);
+    afficherCalendrier(orderBeneficiaire.length);
+});
+buttonOrdreSaisie.addEventListener("click", function() {
+    orderBeneficiaire = [...orderSaisie];
+    afficherCalendrier(orderBeneficiaire.length);
+});
