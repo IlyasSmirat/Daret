@@ -22,6 +22,9 @@ const detailBeneficiaire = document.querySelector("#detail-beneficiaire");
 const detailMontant = document.querySelector("#detail-montant");
 const detailContributeurs = document.querySelector("#detail-contributeurs");
 const detailFermer = document.querySelector("#detail-fermer");
+const boutonReinitialiser = document.querySelector("#reinitialiser");
+const etatVide = document.querySelector("#etat-vide");
+const contenuResultat = document.querySelector("#contenu-resultat");
 
 let prochainId = 1;
 
@@ -418,4 +421,22 @@ detailTour.addEventListener("click", function(event) {
     if (event.target === detailTour) {
         detailTour.close();
     }
+});
+
+boutonReinitialiser.addEventListener("click", function() {
+    formulaire.reset();
+    ParticipantsList.textContent = "";
+    prochainId = 1;
+    creeParticipant();
+    creeParticipant();
+    creeParticipant();
+    participantsCounter();
+    calendriercorps.textContent = "";
+    resumeCagnotte.textContent = "";
+    resumeTotalCycle.textContent = "";
+    resumeNbTours.textContent = "";
+    ResumeDates.textContent = "";
+    compteurTours.textContent = "";
+    contenuResultat.classList.add("hidden");
+    etatVide.classList.remove("hidden");
 });
