@@ -15,6 +15,13 @@ const calendriercorps = document.querySelector("#calendrier-corps");
 const buttonTirage = document.querySelector("#tirage-au-sort");
 const buttonOrdreSaisie = document.querySelector("#ordre-saisie");
 const compteurTours = document.querySelector("#compteur-tours");
+const detailTour = document.querySelector("#detail-tour");
+const detailTitre = document.querySelector("#detail-titre");
+const detailDate = document.querySelector("#detail-date");
+const detailBeneficiaire = document.querySelector("#detail-beneficiaire");
+const detailMontant = document.querySelector("#detail-montant");
+const detailContributeurs = document.querySelector("#detail-contributeurs");
+const detailFermer = document.querySelector("#detail-fermer");
 
 let prochainId = 1;
 
@@ -274,7 +281,15 @@ function afficherCalendrier(nombreTours){
         ligne.appendChild(celluleDate);
         const nomBenificiaire = orderBeneficiaire[numeroTour - 1];
         const celluleBeneficiaire = document.createElement("td");
-        celluleBeneficiaire.textContent = nomBenificiaire;
+
+        const boutonBeneficiaire = document.createElement("button");
+        boutonBeneficiaire.type = "button";
+        boutonBeneficiaire.textContent = nomBenificiaire;
+        boutonBeneficiaire.dataset.action = "detail-tour";
+        boutonBeneficiaire.dataset.tour = numeroTour;
+        boutonBeneficiaire.classList.add("text-left", "underline", "underline-offset-2");
+
+        celluleBeneficiaire.appendChild(boutonBeneficiaire);
         ligne.appendChild(celluleBeneficiaire);
         const Cellulemontant = document.createElement("td");
         Cellulemontant.textContent = `${Number(cotisation.value) * nombreTours } MAD`;
@@ -358,3 +373,49 @@ function actualiserProchainTour() {
         prochain.closest("tr").classList.add("prochain-tour");
     }
 }
+    let boutonQuiOuvre = null;
+    calendriercorps.addEventListener("click", function(event) {
+    const boutonDetail = event.target.closest('[data-action="detail-tour"]');
+
+    if (!boutonDetail) {
+        return;
+    }
+    boutonQuiOuvre = boutonDetail;
+    const ligne = boutonDetail.closest("tr");
+        const numeroTour = Number(boutonDetail.dataset.tour);
+
+    const cellules = ligne.querySelectorAll("td");
+    const dateTour = cellules[1].textContent;
+    const nomBeneficiaire = cellules[2].querySelector("button").textContent;
+    const montantRecu = cellules[3].textContent;
+
+    detailTitre.textContent = `Détail du tour n° ${numeroTour}`;
+    detailDate.textContent = dateTour;
+    detailBeneficiaire.textContent = nomBeneficiaire;
+    detailMontant.textContent = montantRecu;
+    detailContributeurs.textContent = "";
+
+    orderBeneficiaire.forEach(function(nom) {
+    if (nom !== nomBeneficiaire) {
+        const element = document.createElement("li");
+        element.textContent = nom;
+        detailContributeurs.appendChild(element);
+    } 
+    });
+    detailTour.showModal();
+});
+
+detailFermer.addEventListener("click", function() {
+    detailTour.close();
+});
+
+detailTour.addEventListener("close", function() {
+    if (boutonQuiOuvre) {
+        boutonQuiOuvre.focus();
+    }
+});
+detailTour.addEventListener("click", function(event) {
+    if (event.target === detailTour) {
+        detailTour.close();
+    }
+});
