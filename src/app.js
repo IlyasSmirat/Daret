@@ -14,6 +14,7 @@ const ResumeDates = document.querySelector("#resume-dates");
 const calendriercorps = document.querySelector("#calendrier-corps");
 const buttonTirage = document.querySelector("#tirage-au-sort");
 const buttonOrdreSaisie = document.querySelector("#ordre-saisie");
+const compteurTours = document.querySelector("#compteur-tours");
 
 let prochainId = 1;
 
@@ -283,7 +284,18 @@ function afficherCalendrier(nombreTours){
         CelluleStatus.textContent = "A venir";
         CelluleStatus.classList.add("px-4", "py-3");
         ligne.appendChild(CelluleStatus);
+        CelluleStatus.dataset.statut = "avenir";
         calendriercorps.appendChild(ligne);
+        const CelluleAction = document.createElement("td");
+        const buttonStatus = document.createElement("button");
+        buttonStatus.type = "button";
+        buttonStatus.dataset.action = "basculer-statut";
+        buttonStatus.textContent = "Marquer comme terminé";
+        buttonStatus.classList.add("rounded-md", "border", "px-3", "py-2");
+
+        CelluleAction.classList.add("px-4", "py-3");
+        CelluleAction.appendChild(buttonStatus);
+        ligne.appendChild(CelluleAction);
     }
 }
 
@@ -304,3 +316,45 @@ buttonOrdreSaisie.addEventListener("click", function() {
     orderBeneficiaire = [...orderSaisie];
     afficherCalendrier(orderBeneficiaire.length);
 });
+calendriercorps.addEventListener("click", function(event) {
+    const bouton = event.target.closest('[data-action="basculer-statut"]');
+    const ligne = bouton.closest("tr");
+    const celluleStatus = ligne.querySelector("[data-statut]");
+    const termine = celluleStatus.dataset.statut === "termine";
+
+    if (termine) {
+        celluleStatus.dataset.statut = "avenir";
+        celluleStatus.textContent = "À venir";
+        bouton.textContent = "Marquer comme terminé";
+        ligne.classList.remove("ligne-terminee");
+    } else {
+        celluleStatus.dataset.statut = "termine";
+        celluleStatus.textContent = "Terminé";
+        bouton.textContent = "Annuler";
+        ligne.classList.add("ligne-terminee");
+    }
+    actualiserCompteurTours();
+    actualiserProchainTour();
+});
+
+function actualiserCompteurTours(){
+
+    const lignes = calendriercorps.querySelectorAll("tr");
+    const tournumber = lignes.length;
+    const tourstermine = calendriercorps.querySelectorAll('[data-statut = "termine"]').length;
+
+    compteurTours.textContent = `${tourstermine} Tours Términés sur ${tournumber}`;
+
+}
+
+function actualiserProchainTour() {
+    calendriercorps.querySelectorAll("tr").forEach(function(ligne) {
+        ligne.classList.remove("prochain-tour");
+    });
+
+    const prochain = calendriercorps.querySelector('[data-statut="avenir"]');
+
+    if (prochain) {
+        prochain.closest("tr").classList.add("prochain-tour");
+    }
+}
